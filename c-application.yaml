@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: company-infra-c
+  namespace: argocd   # ArgoCD 설치 namespace (일반적으로 argocd)
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/wlals2/company-infra-finish-c.git'
+    targetRevision: main
+    path: .
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: company-infra
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
