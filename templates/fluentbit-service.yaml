@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-fluentbit
+  labels:
+    app: efk
+    component: fluentbit
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    app: efk
+    component: fluentbit
+  ports:
+  - name: http
+    port: {{ .Values.service.fluentbit.httpPort }}
+    targetPort: http
+    nodePort: {{ .Values.service.fluentbit.httpNodePort }}
+  - name: metrics
+    port: {{ .Values.service.fluentbit.metricsPort }}
+    targetPort: metrics
+    nodePort: {{ .Values.service.fluentbit.metricsNodePort }}
+

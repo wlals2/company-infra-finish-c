@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-elasticsearch
+  labels:
+    app: efk
+    component: elasticsearch
+spec:
+  serviceName: {{ .Release.Name }}-elasticsearch
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: efk
+      component: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: efk
+        component: elasticsearch
+    spec:
+      containers:
+      - name: elasticsearch
+        image: "{{ .Values.image.elasticsearch.repository }}:{{ .Values.image.elasticsearch.tag }}"
+        env:
+        - name: discovery.type
+          value: single-node
+        - name: xpack.security.enabled
+          value: "false"
+        ports:
+        - name: http
+          containerPort: 9200
+        - name: transport
+          containerPort: 9300
+        resources:
+          requests:
+            cpu:    {{ .Values.elasticsearch.resources.requests.cpu }}
+            memory: {{ .Values.elasticsearch.resources.requests.memory }}
+          limits:
+            cpu:    {{ .Values.elasticsearch.resources.limits.cpu }}
+            memory: {{ .Values.elasticsearch.resources.limits.memory }}
+        volumeMounts:
+        - name: data
+          mountPath: /usr/share/elasticsearch/data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: {{ .Values.elasticsearch.volume.size }}
+

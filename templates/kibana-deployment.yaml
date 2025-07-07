@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-kibana
+  labels:
+    app: efk
+    component: kibana
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: efk
+      component: kibana
+  template:
+    metadata:
+      labels:
+        app: efk
+        component: kibana
+    spec:
+      containers:
+      - name: kibana
+        image: "{{ .Values.image.kibana.repository }}:{{ .Values.image.kibana.tag }}"
+        env:
+        - name: ELASTICSEARCH_HOSTS
+          value: "http://{{ .Release.Name }}-elasticsearch:{{ .Values.service.elasticsearch.port }}"
+        - name: SERVER_HOST
+          value: "0.0.0.0"
+        - name: XPACK_SECURITY_ENABLED
+          value: "false"
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.kibana.port }}
+

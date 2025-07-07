@@ -1,0 +1,54 @@
+replicaCount: 1
+
+image:
+  elasticsearch:
+    repository: docker.elastic.co/elasticsearch/elasticsearch
+    tag: "7.17.0"
+  kibana:
+    repository: docker.elastic.co/kibana/kibana
+    tag: "7.17.0"
+  fluentbit:
+    repository: fluent/fluent-bit
+    tag: "2.2"
+
+service:
+  type: NodePort
+
+  elasticsearch:
+    port:     9200
+    nodePort: 32020
+
+  kibana:
+    port:     5601
+    nodePort: 31601
+
+  fluentbit:
+    httpPort:         2020
+    httpNodePort:     31020
+    metricsPort:      2021
+    metricsNodePort:  31021
+
+elasticsearch:
+  resources:
+    requests:
+      cpu:    "200m"
+      memory: "512Mi"
+    limits:
+      cpu:    "1"
+      memory: "1Gi"
+  extraEnvs:
+    - name: discovery.type
+      value: single-node
+    - name: xpack.security.enabled
+      value: false
+    - name: ES_JAVA_OPTS
+      value: "-Xms512m -Xmx512m"
+  volume:
+    size: 5Gi
+
+fluentbit:
+  backend:
+    host:  company-infra-c-elasticsearch
+    port:  9200
+    index: kubernetes-logs
+

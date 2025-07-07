@@ -1,0 +1,7 @@
+apiVersion: v2
+name: efk
+description: A local Helm chart for deploying EFK (Elasticsearch, Fluent Bit, Kibana)
+type: application
+version: 0.1.0
+appVersion: "7.17.0"
+

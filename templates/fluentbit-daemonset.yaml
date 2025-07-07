@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ .Release.Name }}-fluentbit
+  labels:
+    app: efk
+    component: fluentbit
+spec:
+  selector:
+    matchLabels:
+      app: efk
+      component: fluentbit
+  template:
+    metadata:
+      labels:
+        app: efk
+        component: fluentbit
+    spec:
+      containers:
+      - name: fluentbit
+        image: "{{ .Values.image.fluentbit.repository }}:{{ .Values.image.fluentbit.tag }}"
+        volumeMounts:
+        - name: config
+          mountPath: /fluent-bit/etc/fluent-bit.conf
+          subPath: fluent-bit.conf
+        - name: config
+          mountPath: /fluent-bit/etc/parsers.conf
+          subPath: parsers.conf
+        - name: varlog
+          mountPath: /var/log
+        - name: varlibdocker
+          mountPath: /var/lib/docker/containers
+      volumes:
+      - name: config
+        configMap:
+          name: {{ .Release.Name }}-fluentbit-config
+      - name: varlog
+        hostPath:
+          path: /var/log
+      - name: varlibdocker
+        hostPath:
+          path: /var/lib/docker/containers
+
